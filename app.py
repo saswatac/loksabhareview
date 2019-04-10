@@ -42,18 +42,16 @@ app.layout = html.Div(
     [Input('constituency', 'value')])
 def update_member(constituency_name):
     if not constituency_name:
-        return None
+        return []
     data_2014 = df_2014[df_2014.Constituency == constituency_name].iloc[0]
     data_2009 = df_2009[df_2009.Constituency == constituency_name].iloc[0]
 
     attribs = ["Debates", "Private Member Bills", "Questions", "Attendance"]
     fig = tools.make_subplots(rows=2, cols=2, subplot_titles=attribs)
-    go.layout.Title
     shapes = []
     for i, attr in enumerate(attribs):
         x = i / 2 + 1
         y = i % 2 + 1
-        # 2014 data
         fig.append_trace(
             go.Bar(
                 x=["2014", "2009"],

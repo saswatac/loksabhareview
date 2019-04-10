@@ -5,8 +5,14 @@ import pandas as pd
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 
-df_2014 = pd.read_csv("mp_track_2014.csv", delimiter='\t')
-df_2009 = pd.read_csv("mp_track_2009.csv", delimiter='\t')
+def strip_percent(x):
+    try:
+        return int(x.strip("%"))
+    except:
+        return None
+
+df_2014 = pd.read_csv("mp_track_2014.csv", delimiter='\t', converters={"Attendance": strip_percent})
+df_2009 = pd.read_csv("mp_track_2009.csv", delimiter='\t', converters={"Attendance": strip_percent})
 
 color_options = ["Gender", "Educational qualifications", "Political party"]
 color_option_filters = {option: df_2014[option].unique() for option in color_options}
