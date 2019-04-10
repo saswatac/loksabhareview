@@ -3,6 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 import plotly.graph_objs as go
+from plotly import tools
 from dash.dependencies import Input, Output
 
 df_2014 = pd.read_csv("mp_track_2014.csv", delimiter='\t')
@@ -13,7 +14,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div(
-    style={"width": "100%"},
+    style={"width": "100%", "height": "100%"},
     children=[
         html.H1(children='Compare Members'),
         dcc.Dropdown(
@@ -27,29 +28,9 @@ app.layout = html.Div(
         ),
         # data div
         html.Div(
-            style={"width": "80%", "margin-left": "10%"},
+            style={"width": "50%", "margin-left": "25%", "height": "700px"},
             children=[
-                # Row container div
-                html.Div(
-                    style={"display": "flex"},
-                    children=[
-                        html.Div(
-                            style={"width": "50%"},
-                            children=[
-                                html.H3(children='2014', style={"text-align": "center"}),
-                                html.Div(id="name-2014", style={"text-align": "center"})
-                            ]
-                        ),
-                        html.Div(
-                            style={"flex-grow": 1, "width": "50%"},
-                            children=[
-                                html.H3(children='2009', style={"text-align": "center"}),
-                                html.Div(id="name-2009", style={"text-align": "center"})
-                            ]
-                        ),
-                    ]
-                ),
-                dcc.Graph(id='compare-member-by-year')
+                dcc.Graph(id='compare-member-by-year', style={'height': '700px'})
             ]
         )
     ]
@@ -57,48 +38,48 @@ app.layout = html.Div(
 
 
 @app.callback(
-    [Output('name-2014', 'children'),
-     Output('name-2009', 'children'),
-     Output('compare-member-by-year', 'figure')],
+    Output('compare-member-by-year', 'figure'),
     [Input('constituency', 'value')])
 def update_member(constituency_name):
     if not constituency_name:
-        return None, None, {"data": []}
-    attributes = ["MP Name", "Political party", "Debates", "Private Member Bills", "Questions", "Attendance"]
-    data_2014 = df_2014[df_2014.Constituency == constituency_name].get(attributes).values[0]
-    data_2009 = df_2009[df_2009.Constituency == constituency_name].get(attributes).values[0]
+        return None
+    data_2014 = df_2014[df_2014.Constituency == constituency_name].iloc[0]
+    data_2009 = df_2009[df_2009.Constituency == constituency_name].iloc[0]
 
-    fig = {"data": [
-        go.Bar(
-            x=attributes[2:],
-            y=data_2014[2:],
-            name='2014',
-            marker=go.bar.Marker(
-                color='rgb(26, 118, 255)'
-            )
-        ),
-        go.Bar(
-            x=attributes[2:],
-            y=data_2009[2:],
-            name='2009',
-            marker=go.bar.Marker(
-                color='rgb(55, 83, 109)'
-            )
-        )
-        ],
-        "layout": go.Layout(
-            showlegend=True,
-            legend=go.layout.Legend(
-                x=0,
-                y=1.0
-            ),
-            margin=go.layout.Margin(l=40, r=0, t=40, b=30)
-        )
+    attribs = ["Debates", "Private Member Bills", "Questions", "Attendance"]
+    fig = tools.make_subplots(rows=2, cols=2, subplot_titles=attribs)
+    go.layout.Title
+    shapes = []
+    for i, attr in enumerate(attribs):
+        x = i / 2 + 1
+        y = i % 2 + 1
+        # 2014 data
+        fig.append_trace(
+            go.Bar(
+                x=["2014", "2009"],
+                y=[data_2014[attr], data_2009[attr]],
+                marker=go.bar.Marker(color=['rgb(213, 101, 77)', 'rgb(135, 206, 250)']),
+                width=[0.4, 0.4],
+                name=attr
+            ), x, y)
+    fig['layout']['shapes'] = shapes
+    for i in range(1, 5):
+        fig['layout']["xaxis{}".format(i)]['type'] = "category"
+    fig['layout']['xaxis3']['automargin'] = True
+    fig['layout']['margin'] = {"b": 200}
+    fig['layout']['showlegend'] = False
+    fig['layout']['title'] = {"text": "2014: {} ({}) <br> Vs <br> 2009: {} ({})".format(
+        data_2014["MP Name"],
+        data_2014["Political party"],
+        data_2009["MP Name"],
+        data_2009["Political party"]),
+        "font": {
+            "size": 24,
+        },
+        "y": 0.2
     }
+    return fig
 
-    ret= "{} ({})".format(data_2014[0], data_2014[1]), "{} ({})".format(data_2009[0], data_2009[1]), fig
-    print ret
-    return ret
 
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0')
