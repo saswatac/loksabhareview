@@ -1,22 +1,21 @@
-import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import pandas as pd
 import plotly.graph_objs as go
-from plotly import tools
 from dash.dependencies import Input, Output
+from plotly import tools
 
-df_2014 = pd.read_csv("mp_track_2014.csv", delimiter='\t')
-df_2009 = pd.read_csv("mp_track_2009.csv", delimiter='\t')
+from base_app import app, df_2014, df_2009
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
-app.layout = html.Div(
-    style={"width": "100%", "height": "100%"},
+layout = html.Div(
+    className="container",
     children=[
-        html.H1(children='Compare Members'),
+
+        # data div
+        html.Div(
+            children=[
+                dcc.Graph(id='compare-member-by-year', style={"height": "700px", "margin-top": "5%"})
+            ]
+        ),
         dcc.Dropdown(
             id='constituency',
             options=[
@@ -24,15 +23,7 @@ app.layout = html.Div(
                 for constituency in df_2014.Constituency
             ],
             placeholder="Select a constituency",
-            style={"width": "50%"}
         ),
-        # data div
-        html.Div(
-            style={"width": "50%", "margin-left": "25%", "height": "700px"},
-            children=[
-                dcc.Graph(id='compare-member-by-year', style={'height': '700px'})
-            ]
-        )
     ]
 )
 
@@ -77,7 +68,3 @@ def update_member(constituency_name):
         "y": 0.2
     }
     return fig
-
-
-if __name__ == '__main__':
-    app.run_server(debug=True, host='0.0.0.0')

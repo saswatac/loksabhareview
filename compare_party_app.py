@@ -1,29 +1,19 @@
 from collections import OrderedDict
 
-import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import pandas as pd
 import plotly.graph_objs as go
+from dash.dependencies import Input, Output
 from plotly import tools
 from plotly.colors import DEFAULT_PLOTLY_COLORS
-from dash.dependencies import Input, Output
 
-
-def strip_percent(x):
-    try:
-        return int(x.strip("%"))
-    except:
-        return None
+from base_app import app, df_2014, df_2009
 
 
 def count_grads(x):
     num_grad = x[x.isin(["Graduate", "Doctorate", "Post Graduate", "Professional Graduate"])].count()
-    return  float(num_grad)/ x.count() * 100.0
+    return float(num_grad) / x.count() * 100.0
 
-
-df_2014 = pd.read_csv("mp_track_2014.csv", delimiter='\t', converters={"Attendance": strip_percent})
-df_2009 = pd.read_csv("mp_track_2009.csv", delimiter='\t', converters={"Attendance": strip_percent})
 
 party_list = set(df_2014["Political party"].unique().tolist() + df_2009["Political party"].unique().tolist())
 
@@ -36,19 +26,13 @@ aggregations = OrderedDict([
     ("Questions", "median")
 ])
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
-app.layout = html.Div(
-    style={"width": "100%", "height": "100%"},
+layout = html.Div(
+    className="container",
     children=[
-        html.H1(children='Compare Political Parties'),
         # data div
         html.Div(
-            style={"width": "50%", "margin-left": "25%", "height": "700px"},
             children=[
-                dcc.Graph(id='compare-member-by-year', style={'height': '700px'})
+                dcc.Graph(id='compare-party-by-year', style={"height": "700px", "margin-top": "5%"})
             ]
         ),
         dcc.Dropdown(
@@ -56,14 +40,13 @@ app.layout = html.Div(
             options=[{'label': opt, 'value': opt} for opt in party_list],
             value=['Indian National Congress', 'Bharatiya Janata Party'],
             multi=True,
-            style={"width": "50%"}
         ),
     ]
 )
 
 
 @app.callback(
-    Output('compare-member-by-year', 'figure'),
+    Output('compare-party-by-year', 'figure'),
     [Input('parties', 'value')])
 def update_member(parties):
     if not parties:
@@ -84,9 +67,18 @@ def update_member(parties):
         x = i / 3 + 1
         y = i % 3 + 1
         for j, party in enumerate(parties):
+            data_y = []
+            try:
+                data_y.append(df_group_2009.loc[party, attr])
+            except KeyError:
+                data_y.append(None)
+            try:
+                data_y.append(df_group_2014.loc[party, attr])
+            except KeyError:
+                data_y.append(None)
             fig.append_trace(
                 go.Bar(
-                    y=[df_group_2009.loc[party, attr], df_group_2014.loc[party, attr]],
+                    y=data_y,
                     x=["2009", "2014"],
                     name=party,
                     legendgroup=party,
@@ -95,7 +87,3 @@ def update_member(parties):
                 ), x, y)
         fig['layout']["xaxis{}".format(i + 1)]['type'] = "category"
     return fig
-
-
-if __name__ == '__main__':
-    app.run_server(debug=True, host='0.0.0.0')
