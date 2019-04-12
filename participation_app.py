@@ -1,5 +1,4 @@
 import dash_core_components as dcc
-import dash_html_components as html
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 
@@ -9,64 +8,53 @@ color_options = ["Gender", "Educational qualifications", "Political party"]
 color_option_filters = {option: df_2014[option].unique() for option in color_options}
 political_party_default = ["Indian National Congress", "Bharatiya Janata Party"]
 
-layout = html.Div(
-    className="container-fluid",
-    children=[html.Div(className="row",
-                       style={"margin-top": "20px"},
-                       children=[
-                           html.Div(className="col-3", children=[
-                               dcc.Dropdown(
-                                   id='year',
-                                   options=[{"label": "2014", "value": "2014"}, {"label": "2009", "value": "2009"}],
-                                   value="2014",
-                                   placeholder="Select a year",
-                               ),
-                               dcc.Dropdown(
-                                   id='x-metric',
-                                   options=[{"label": "Attendance", "value": "Attendance"},
-                                            {"label": "Age", "value": "Age"}],
-                                   value="Attendance",
-                                   placeholder="Select a metric for x axis",
-                               ),
-                               dcc.Dropdown(
-                                   id='y-metric',
-                                   options=[{"label": "Questions", "value": "Questions"},
-                                            {"label": "Debates", "value": "Debates"},
-                                            {"label": "Private Member Bills", "value": "Private Member Bills"}],
-                                   value="Questions",
-                                   placeholder="Select a metric for y axis",
-                               ),
-                               dcc.Dropdown(
-                                   id='color-metric',
-                                   options=[{"label": "Gender", "value": "Gender"},
-                                            {"label": "Educational qualifications",
-                                             "value": "Educational qualifications"},
-                                            {"label": "Political party", "value": "Political party"}
-                                            ],
-                                   value="Gender",
-                                   placeholder="Select a metric for color",
-                               ),
-                               dcc.Dropdown(
-                                   id='color-metric-values',
-                                   options=[
-                                       {'label': 'Male', 'value': 'Male'},
-                                       {'label': 'Female', 'value': 'Female'},
-                                   ],
-                                   value=['Male', 'Female'],
-                                   multi=True,
-                               ),
-                           ]),
-                           html.Div(className="col-9", style={"height": "700px"},
-                                    children=dcc.Graph(id='scatter-plot', style={"height": "100%"})
-                                    )
-                       ]
+left_controls = [
+    dcc.Dropdown(
+        id='year',
+        options=[{"label": "2014", "value": "2014"}, {"label": "2009", "value": "2009"}],
+        value="2014",
+        placeholder="Select a year",
+    ),
+    dcc.Dropdown(
+        id='x-metric',
+        options=[{"label": "Attendance", "value": "Attendance"},
+                 {"label": "Age", "value": "Age"}],
+        value="Attendance",
+        placeholder="Select a metric for x axis",
+    ),
+    dcc.Dropdown(
+        id='y-metric',
+        options=[{"label": "Questions", "value": "Questions"},
+                 {"label": "Debates", "value": "Debates"},
+                 {"label": "Private Member Bills", "value": "Private Member Bills"}],
+        value="Questions",
+        placeholder="Select a metric for y axis",
+    ),
+    dcc.Dropdown(
+        id='color-metric',
+        options=[{"label": "Gender", "value": "Gender"},
+                 {"label": "Educational qualifications",
+                  "value": "Educational qualifications"},
+                 {"label": "Political party", "value": "Political party"}
+                 ],
+        value="Gender",
+        placeholder="Select a metric for color",
+    ),
+    dcc.Dropdown(
+        id='color-metric-values',
+        options=[
+            {'label': 'Male', 'value': 'Male'},
+            {'label': 'Female', 'value': 'Female'},
+        ],
+        value=['Male', 'Female'],
+        multi=True,
+    ),
+]
 
-    )]
-)
+main_content = dcc.Graph(id='scatter-plot', style={"height": "100%"})
 
 
 @app.callback(
-
     Output('scatter-plot', 'figure'),
     [Input('year', 'value'),
      Input('x-metric', 'value'),

@@ -6,26 +6,16 @@ from plotly import tools
 
 from base_app import app, df_2014, df_2009
 
-layout = html.Div(
-    className="container",
-    children=[
-
-        # data div
-        html.Div(
-            children=[
-                dcc.Graph(id='compare-member-by-year', style={"height": "700px", "margin-top": "5%"})
-            ]
-        ),
-        dcc.Dropdown(
-            id='constituency',
-            options=[
-                {'label': constituency, 'value': constituency}
-                for constituency in df_2014.Constituency
-            ],
-            placeholder="Select a constituency",
-        ),
-    ]
+left_controls = dcc.Dropdown(
+    id='constituency',
+    options=[
+        {'label': constituency, 'value': constituency}
+        for constituency in df_2014.Constituency
+    ],
+    placeholder="Select a constituency",
 )
+
+main_content = dcc.Graph(id='compare-member-by-year', style={"height": "100%"})
 
 
 @app.callback(

@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
 import dash_core_components as dcc
-import dash_html_components as html
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 from plotly import tools
@@ -26,23 +25,14 @@ aggregations = OrderedDict([
     ("Questions", "median")
 ])
 
-layout = html.Div(
-    className="container",
-    children=[
-        # data div
-        html.Div(
-            children=[
-                dcc.Graph(id='compare-party-by-year', style={"height": "700px", "margin-top": "5%"})
-            ]
-        ),
-        dcc.Dropdown(
-            id='parties',
-            options=[{'label': opt, 'value': opt} for opt in party_list],
-            value=['Indian National Congress', 'Bharatiya Janata Party'],
-            multi=True,
-        ),
-    ]
+left_controls = dcc.Dropdown(
+    id='parties',
+    options=[{'label': opt, 'value': opt} for opt in party_list],
+    value=['Indian National Congress', 'Bharatiya Janata Party'],
+    multi=True,
 )
+
+main_content = dcc.Graph(id='compare-party-by-year', style={"height": "100%"})
 
 
 @app.callback(
