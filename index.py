@@ -37,7 +37,6 @@ def display_page(pathname):
 
 @server.route('/')
 def hello():
-    print "Base"
     return redirect("apps/compare_party", 303)
 
 
