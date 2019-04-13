@@ -62,7 +62,8 @@ main_content = dcc.Graph(id='scatter-plot', style={"height": "100%"})
      Input('color-metric', 'value'),
      Input('color-metric-values', 'value')])
 def update_participation_graph(year, x_metric, y_metric, color_metric, color_metric_values):
-    print year
+    if not all([year, x_metric, y_metric, color_metric]):
+        return []
     df = df_2014 if year == "2014" else df_2009
     figure = {
         'data': [
@@ -94,5 +95,7 @@ def update_participation_graph(year, x_metric, y_metric, color_metric, color_met
      Output('color-metric-values', 'value')],
     [Input('color-metric', 'value')])
 def set_color_metric_values(color_metric):
+    if not color_metric:
+        return [], []
     values = political_party_default if color_metric == "Political party" else color_option_filters[color_metric]
     return [{"label": opt, "value": opt} for opt in color_option_filters[color_metric]], values

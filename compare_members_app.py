@@ -1,18 +1,22 @@
 import dash_core_components as dcc
-import dash_html_components as html
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 from plotly import tools
+from plotly.colors import DEFAULT_PLOTLY_COLORS
+
 
 from base_app import app, df_2014, df_2009
+
+CONSTITUENCY = sorted(df_2014["Constituency"].dropna())
 
 left_controls = dcc.Dropdown(
     id='constituency',
     options=[
         {'label': constituency, 'value': constituency}
-        for constituency in df_2014.Constituency
+        for constituency in CONSTITUENCY
     ],
     placeholder="Select a constituency",
+    value=CONSTITUENCY[0]
 )
 
 main_content = dcc.Graph(id='compare-member-by-year', style={"height": "100%"})
@@ -35,9 +39,9 @@ def update_member(constituency_name):
         y = i % 2 + 1
         fig.append_trace(
             go.Bar(
-                x=["2014", "2009"],
-                y=[data_2014[attr], data_2009[attr]],
-                marker=go.bar.Marker(color=['rgb(213, 101, 77)', 'rgb(135, 206, 250)']),
+                x=["2009", "2014"],
+                y=[data_2009[attr], data_2014[attr]],
+                marker=go.bar.Marker(color=DEFAULT_PLOTLY_COLORS[:2]),
                 width=[0.4, 0.4],
                 name=attr
             ), x, y)
@@ -47,11 +51,11 @@ def update_member(constituency_name):
     fig['layout']['xaxis3']['automargin'] = True
     fig['layout']['margin'] = {"b": 200}
     fig['layout']['showlegend'] = False
-    fig['layout']['title'] = {"text": "2014: {} ({}) <br> Vs <br> 2009: {} ({})".format(
-        data_2014["MP Name"],
-        data_2014["Political party"],
+    fig['layout']['title'] = {"text": "2009: {} ({}) <br> Vs <br> 2014: {} ({})".format(
         data_2009["MP Name"],
-        data_2009["Political party"]),
+        data_2009["Political party"],
+        data_2014["MP Name"],
+        data_2014["Political party"]),
         "font": {
             "size": 24,
         },
