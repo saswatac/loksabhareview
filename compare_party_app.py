@@ -44,7 +44,8 @@ titles = ["No of members",
 left_controls = dcc.Dropdown(
     id='parties',
     options=[{'label': opt, 'value': opt} for opt in party_list],
-    value=['Indian National Congress', 'Bharatiya Janata Party'],
+    # value=['Indian National Congress', 'Bharatiya Janata Party'],
+    placeholder="Select political parties",
     multi=True,
 )
 

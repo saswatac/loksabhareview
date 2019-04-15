@@ -16,8 +16,8 @@ left_controls = dcc.Dropdown(
         {'label': constituency, 'value': constituency}
         for constituency in CONSTITUENCY
     ],
-    placeholder="Select a constituency",
-    value=CONSTITUENCY[0]
+    placeholder="Select a constituency"
+    # value=CONSTITUENCY[0]
 )
 
 main_content = [
