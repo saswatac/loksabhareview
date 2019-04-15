@@ -51,7 +51,7 @@ left_controls = [
     ),
 ]
 
-main_content = dcc.Graph(id='scatter-plot', style={"height": "100%"})
+main_content = dcc.Graph(id='scatter-plot')
 
 
 @app.callback(

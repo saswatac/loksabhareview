@@ -1,7 +1,7 @@
 import dash
+import pandas as pd
 import dash_html_components as html
 import flask
-import pandas as pd
 
 external_stylesheets = [
     {
@@ -40,8 +40,8 @@ base_layout = html.Div(
     children=[html.Div(className="row",
                        style={"margin-top": "20px"},
                        children=[
-                           html.Div(id="left-sidebar", className="col-3 bg-light sidebar"),
-                           html.Div(id="main-content", className="col-9", style={"height": "700px"})
+                           html.Div(id="left-sidebar", className="col-sm-3 bg-light sidebar"),
+                           html.Div(id="main-content", className="col-sm-9")
                        ]
                        )
               ]
