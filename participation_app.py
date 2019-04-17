@@ -1,12 +1,14 @@
 import dash_core_components as dcc
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
-
+import plotly
 from base_app import app, df_2009, df_2014
 
-color_options = ["Gender", "Educational qualifications", "Political party"]
+color_options = ["Gender", "Educational qualifications", "Political party", "Number of terms"]
 color_option_filters = {option: df_2014[option].unique() for option in color_options}
 political_party_default = ["Indian National Congress", "Bharatiya Janata Party"]
+
+term_order = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eight", "Ninth"]
 
 left_controls = [
     dcc.Dropdown(
@@ -32,11 +34,7 @@ left_controls = [
     ),
     dcc.Dropdown(
         id='color-metric',
-        options=[{"label": "Gender", "value": "Gender"},
-                 {"label": "Educational qualifications",
-                  "value": "Educational qualifications"},
-                 {"label": "Political party", "value": "Political party"}
-                 ],
+        options=[{"label": opt, "value": opt} for opt in color_options],
         value="Gender",
         placeholder="Select a metric for color",
     ),
@@ -65,20 +63,31 @@ def update_participation_graph(year, x_metric, y_metric, color_metric, color_met
     if not all([year, x_metric, y_metric, color_metric]):
         return []
     df = df_2014 if year == "2014" else df_2009
+    colors = None
+    if color_metric == 'Number of terms':
+        color_metric_values = [term for term in term_order if term in color_metric_values]
+        colors = plotly.colors.n_colors('rgb(0,32,76)', 'rgb(255,233,69)', len(color_metric_values),
+                                        colortype='rgb')
+        colors.reverse()
+    data = []
+    for i, color_metric_value in enumerate(color_metric_values):
+        marker = {
+            'size': 15,
+            'line': {'width': 0.5, 'color': 'white'},
+        }
+        if colors:
+            marker['color'] = colors[i]
+        data.append(go.Scatter(
+            x=df[df[color_metric] == color_metric_value][x_metric],
+            y=df[df[color_metric] == color_metric_value][y_metric],
+            text=df[df[color_metric] == color_metric_value]['MP Name'],
+            mode='markers',
+            opacity=0.7,
+            marker=marker,
+            name=color_metric_value
+        ))
     figure = {
-        'data': [
-            go.Scatter(
-                x=df[df[color_metric] == i][x_metric],
-                y=df[df[color_metric] == i][y_metric],
-                text=df[df[color_metric] == i]['MP Name'],
-                mode='markers',
-                opacity=0.7,
-                marker={
-                    'size': 15,
-                    'line': {'width': 0.5, 'color': 'white'}
-                },
-                name=i
-            ) for i in color_metric_values],
+        'data': data,
         'layout': go.Layout(
             xaxis={'title': x_metric},
             yaxis={'title': y_metric},
