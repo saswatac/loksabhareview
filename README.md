@@ -3,6 +3,8 @@
 This is an application built using Dash, a framework for building interactive dashboard applications in pure python.
 The project structure follows the conventions layed out for multi-page apps in https://dash.plot.ly/urls .
 
+![](compare_party.png)
+
 List of data sources -
 
 * Parliamentary performance data: https://www.prsindia.org/mptrack
