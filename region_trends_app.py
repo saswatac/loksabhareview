@@ -58,7 +58,7 @@ def get_map_data(region_metric):
         height=600,
         autosize=True,
         legend=dict(orientation="h"),
-        title=title,
+        title=go.layout.Title(text=title, y=0.1),
         hovermode='closest',
         mapbox=dict(
             layers=[
