@@ -9,6 +9,7 @@ import base_app
 import compare_members_app
 import compare_party_app
 import participation_app
+import region_trends_app
 from base_app import app, server
 
 app.layout = html.Div([
@@ -31,8 +32,10 @@ def display_page(pathname):
         return participation_app.left_controls, participation_app.main_content
     elif pathname == '/apps/compare_party':
         return compare_party_app.left_controls, compare_party_app.main_content
+    elif pathname == '/apps/compare_regions':
+        return region_trends_app.left_controls, region_trends_app.main_content
     else:
-        return [], "Welcome to the Lok Sabha Review!"
+        return [], "Welcome to Lok Sabha Review!"
 
 
 @server.route('/')

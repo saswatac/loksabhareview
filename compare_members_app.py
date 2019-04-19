@@ -6,15 +6,19 @@ from plotly.colors import DEFAULT_PLOTLY_COLORS
 
 from base_app import app, df_2014, df_2009
 
-CONSTITUENCY = sorted(df_2014["Constituency"].dropna())
+MENU_ITEMS = [tuple(x) for x in df_2014[["Constituency", "State"]].dropna().values]
+MENU_ITEMS.sort()
+
+NEW_STATE = {"Telangana": "Andhra Pradesh"}
+
 attribs = ["Debates", "Private Member Bills", "Questions", "Attendance"]
 ids = ["member-metric-graph-{}".format(i) for i in range(4)]
 
 left_controls = dcc.Dropdown(
     id='constituency',
     options=[
-        {'label': constituency, 'value': constituency}
-        for constituency in CONSTITUENCY
+        {'label': ", ".join(item), 'value': ",".join(item)}
+        for item in MENU_ITEMS
     ],
     placeholder="Select a constituency"
     # value=CONSTITUENCY[0]
@@ -36,11 +40,13 @@ main_content = [
 @app.callback(
     [Output(i, 'figure') for i in ids] + [Output("title", 'children')],
     [Input('constituency', 'value')])
-def update_member(constituency_name):
-    if not constituency_name:
+def update_member(selection):
+    if not selection:
         return [[] for x in ids]
-    data_2014 = df_2014[df_2014.Constituency == constituency_name].iloc[0]
-    data_2009 = df_2009[df_2009.Constituency == constituency_name].iloc[0]
+    constituency_name, state = selection.split(",")
+    old_state = NEW_STATE[state] if state in NEW_STATE else state
+    data_2014 = df_2014[(df_2014.Constituency == constituency_name) & (df_2014.State == state)].iloc[0]
+    data_2009 = df_2009[(df_2009.Constituency == constituency_name) & (df_2009.State == old_state)].iloc[0]
 
     figs = []
     for attr in attribs:
