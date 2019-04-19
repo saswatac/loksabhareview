@@ -1,3 +1,5 @@
+import os
+
 import dash_core_components as dcc
 import plotly
 import plotly.graph_objs as go
@@ -5,7 +7,7 @@ from dash.dependencies import Input, Output
 
 from base_app import app
 
-mapbox_access_token = "pk.eyJ1Ijoic2Fzd2F0YWMiLCJhIjoiY2p1bDR4Nm1vMDByOTN5bXVmOG1pYXB4dyJ9.y9jbd2V_NpUV1UHkl5x3Lw"
+mapbox_access_token = os.getenv("MAPBOX_API_KEY")
 
 left_controls = [dcc.Dropdown(
     id='region-metric',
@@ -49,7 +51,7 @@ def get_map_data(region_metric):
             marker=go.scattermapbox.Marker(
                 color=colorscale[i]
             ),
-            name="<{}".format(bucket[i]) if i == 0 else ">{}".format(bucket[i-1]) if i == 6 else "{}-{}".format(
+            name="<{}".format(bucket[i]) if i == 0 else ">{}".format(bucket[i - 1]) if i == 6 else "{}-{}".format(
                 bucket[i - 1], bucket[i])
         )
         for i in range(7)

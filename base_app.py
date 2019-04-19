@@ -34,15 +34,3 @@ def strip_percent(x):
 
 df_2014 = pd.read_csv("mp_track_2014.csv", delimiter='\t', converters={"Attendance": strip_percent})
 df_2009 = pd.read_csv("mp_track_2009.csv", delimiter='\t', converters={"Attendance": strip_percent})
-
-base_layout = html.Div(
-    className="container-fluid",
-    children=[html.Div(className="row",
-                       style={"margin-top": "20px"},
-                       children=[
-                           html.Div(id="left-sidebar", className="col-sm-3 bg-light sidebar"),
-                           html.Div(id="main-content", className="col-sm-9")
-                       ]
-                       )
-              ]
-)

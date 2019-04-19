@@ -5,16 +5,27 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 from flask import redirect
 
-import base_app
 import compare_members_app
 import compare_party_app
 import participation_app
 import region_trends_app
 from base_app import app, server
 
+base_layout = html.Div(
+    className="container-fluid",
+    children=[html.Div(className="row",
+                       style={"margin-top": "20px"},
+                       children=[
+                           html.Div(id="left-sidebar", className="col-sm-3 bg-light sidebar"),
+                           html.Div(id="main-content", className="col-sm-9")
+                       ]
+                       )
+              ]
+)
+
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    base_app.base_layout
+    base_layout
 ])
 
 with open(os.path.join(app._assets_folder, "index.html")) as f:
